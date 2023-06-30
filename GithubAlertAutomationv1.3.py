@@ -6,6 +6,8 @@ import pandas as pd
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse, parse_qs
 
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 import openpyxl
@@ -13,10 +15,17 @@ import datetime
 
 # Set up IMAP server details
 imap_server = 'imap.gmail.com'
-username = 'example@gmail.com'
-password = 'APP PASSWORD' # This must be an app password, this can be enabled at the 2fa page on google
+username = 'example.alerts@gmail.com'
+password = '----------------' # can be dounf at the 2fa page on google
 
-def Find_Links(subject, email_id_num = -1):
+scope = [
+        'https://www.googleapis.com/auth/spreadsheets',
+        'https://www.googleapis.com/auth/drive'
+    ]
+
+creds = ServiceAccountCredentials.from_json_keyfile_name(
+    "/Users/user/PycharmProjects/AlertAutomation/client_secret2s.json", scopes=scope)
+def Find_Links(subject, email_id_num):
     # Connect to the IMAP server
     server = imaplib.IMAP4_SSL(imap_server)
     server.login(username, password)
@@ -129,6 +138,16 @@ def Find_Links(subject, email_id_num = -1):
             df_final.to_excel(excel_file, index=False)
         else:
             df.to_excel(excel_file, index=False)
+
+        file = gspread.authorize(creds)
+        workbook = file.open("GradAchiever links")
+        sheet = workbook.worksheet(title='Sheet1')
+
+        # Convert DataFrame to a list of lists
+        values = df.values.tolist()
+
+        # Append values to the worksheet
+        sheet.append_rows(values)
 
     # Close the server connection
     server.close()
