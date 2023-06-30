@@ -16,7 +16,9 @@ import datetime
 # Set up IMAP server details
 imap_server = 'imap.gmail.com'
 username = 'example.alerts@gmail.com'
-password = '----------------' # can be dounf at the 2fa page on google
+password = '----------------' # This is an app password, this password can be found at the 2fa page on google
+workbook_name = 'Alert Links'
+sheet_title = 'Sheet1'
 
 scope = [
         'https://www.googleapis.com/auth/spreadsheets',
@@ -140,8 +142,8 @@ def Find_Links(subject, email_id_num):
             df.to_excel(excel_file, index=False)
 
         file = gspread.authorize(creds)
-        workbook = file.open("GradAchiever links")
-        sheet = workbook.worksheet(title='Sheet1')
+        workbook = file.open(workbook_name)
+        sheet = workbook.worksheet(title=sheet_title) # Change the title name here
 
         # Convert DataFrame to a list of lists
         values = df.values.tolist()
