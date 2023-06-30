@@ -16,7 +16,7 @@ imap_server = 'imap.gmail.com'
 username = 'example@gmail.com'
 password = 'APP PASSWORD' # This must be an app password, this can be enabled at the 2fa page on google
 
-def Find_Links(subject):
+def Find_Links(subject, email_id_num = -1):
     # Connect to the IMAP server
     server = imaplib.IMAP4_SSL(imap_server)
     server.login(username, password)
@@ -28,7 +28,7 @@ def Find_Links(subject):
     status, response = server.search(None, subject)
 
     # Get the latest email ID
-    latest_email_id = response[0].split()[-1]
+    latest_email_id = response[0].split()[email_id_num]
 
     # Fetch the email content
     status, email_data = server.fetch(latest_email_id, '(RFC822)')
@@ -134,9 +134,11 @@ def Find_Links(subject):
     server.close()
     server.logout()
 
-Find_Links('SUBJECT "Google Alert - college admission"')
-Find_Links('SUBJECT "Google Alert - financial aid"')
-Find_Links('SUBJECT "Google Alert - internship"')
-Find_Links('SUBJECT "Google Alert - volunteer"')
-Find_Links('SUBJECT "Google Alert - scholarship"')
-
+email_id_num = -1
+while (email_id_num < 0):
+    #Find_Links('SUBJECT "Google Alert - college admission"')
+    #Find_Links('SUBJECT "Google Alert - financial aid"')
+    Find_Links('SUBJECT "Google Alert - internship"', email_id_num)
+    Find_Links('SUBJECT "Google Alert - volunteer"', email_id_num)
+    Find_Links('SUBJECT "Google Alert - scholarship"', email_id_num)
+    email_id_num += 1
