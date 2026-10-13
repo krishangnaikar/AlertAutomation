@@ -32,3 +32,13 @@ def test_provider_error_is_not_reported_as_article():
     openai.Completion.create.side_effect = RuntimeError('offline')
     with pytest.raises(RuntimeError, match='offline'):
         module['is_article']('https://example.test')
+
+def test_empty_alert_search_closes_connection_without_fetching():
+    module, _ = load()
+    server = MagicMock()
+    server.search.return_value = ('OK', [b''])
+    with patch.object(module['imaplib'], 'IMAP4_SSL', return_value=server):
+        assert module['Find_Links']('SUBJECT "missing alert"') is None
+    server.fetch.assert_not_called()
+    server.close.assert_called_once()
+    server.logout.assert_called_once()
