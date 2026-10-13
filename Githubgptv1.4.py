@@ -56,7 +56,12 @@ def Find_Links(subject):
     status, response = server.search(None, subject)
 
     # Get the latest email ID
-    latest_email_id = response[0].split()[-1]
+    email_ids = response[0].split()
+    if not email_ids:
+        server.close()
+        server.logout()
+        return
+    latest_email_id = email_ids[-1]
 
     # Fetch the email content
     status, email_data = server.fetch(latest_email_id, '(RFC822)')
